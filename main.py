@@ -46,6 +46,24 @@ def tree_lt(t1: HTree, t2: HTree) -> bool:
         return t1.count < t2.count
     return t1.char < t2.char
 
+# Returns the HTree at said index within the HTList
+def list_ref(list: HTList, idx: int) -> HTree:
+    if idx < 0:
+        raise IndexError("Negative index")
+    if list is None:
+        raise IndexError("Index out of bounds")
+    if idx == 0:
+        return list.value
+    return list_ref(list.rest, idx - 1)
+
+# Returns an HTList containing 256 HLeaf nodes, in order 0 to 255
+def base_tree_list(freqs: List[int]) -> HTList:
+    lst: HTList = None
+    for i in range(255, -1, -1):
+        leaf: HLeaf = HLeaf(freqs[i], chr(i))
+        lst = HTLNode(leaf, lst)
+    return lst
+
 class Tests(unittest.TestCase):
     tree_1 : HTree = HNode(1, "a", HNode(2, "b", HLeaf(4, "d"), HLeaf(5, "e")), HNode(3, "c", HLeaf(6, "f"), HLeaf(7, "g")))
     tree_2 : HTree = HNode(8, "h", HLeaf(9, "i"), HLeaf(10, "j"))
@@ -67,6 +85,24 @@ class Tests(unittest.TestCase):
         self.assertEqual(list_len(self.list_1), 0)
         self.assertEqual(list_len(self.list_2), 1)
         self.assertEqual(list_len(self.list_3), 2)
+
+    def test_list_ref(self):
+        self.assertEqual(list_ref(self.list_2, 0), self.tree_1)
+        self.assertEqual(list_ref(self.list_3, 0), self.tree_1)
+        self.assertEqual(list_ref(self.list_3, 1), self.tree_2)
+        with self.assertRaises(IndexError):
+            list_ref(self.list_3, 2)
+
+    def test_base_tree_list(self):
+        freqs = [0] * 256
+        freqs[97] = 5
+        freqs[98] = 3
+        lst = base_tree_list(freqs)
+        self.assertEqual(list_len(lst), 256)
+        self.assertEqual(list_ref(lst, 97).count, 5)
+        self.assertEqual(list_ref(lst, 97).char, 'a')
+        self.assertEqual(list_ref(lst, 98).count, 3)
+        self.assertEqual(list_ref(lst, 98).char, 'b')
 
 
 if (__name__ == '__main__'):
