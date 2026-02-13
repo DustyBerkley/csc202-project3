@@ -56,6 +56,18 @@ def list_ref(list: HTList, idx: int) -> HTree:
         return list.value
     return list_ref(list.rest, idx - 1)
 
+# insert a tree into a given tree list so that it follows the ordering rules of tree_lt
+def tree_list_insert(list: HTList, other_tree: HTree) -> HTList:
+    match list:
+        case None:
+            return HTLNode(other_tree, None)
+        case HTLNode(v, r):
+            if(not tree_lt(v, other_tree)):
+                return HTLNode(other_tree, list)
+            else:
+                return HTLNode(v, tree_list_insert(r, other_tree))
+
+
 # Returns an HTList containing 256 HLeaf nodes, in order 0 to 255
 def base_tree_list(freqs: List[int]) -> HTList:
     lst: HTList = None
@@ -65,8 +77,8 @@ def base_tree_list(freqs: List[int]) -> HTList:
     return lst
 
 class Tests(unittest.TestCase):
-    tree_1 : HTree = HNode(1, "a", HNode(2, "b", HLeaf(4, "d"), HLeaf(5, "e")), HNode(3, "c", HLeaf(6, "f"), HLeaf(7, "g")))
-    tree_2 : HTree = HNode(8, "h", HLeaf(9, "i"), HLeaf(10, "j"))
+    tree_1 : HTree = HNode(1, "a", HNode(2, "b", HLeaf(4, "d"), HLeaf(5, "e")), HNode(3, "c", HLeaf(10, "f"), HLeaf(11, "g")))
+    tree_2 : HTree = HNode(8, "h", HLeaf(9, "i"), HLeaf(14, "j"))
     list_1 : HTList = None
     list_2 : HTList = HTLNode(tree_1, None)
     list_3 : HTList = HTLNode(tree_1, HTLNode(tree_2, None))
@@ -104,6 +116,9 @@ class Tests(unittest.TestCase):
         self.assertEqual(list_ref(lst, 98).count, 3)
         self.assertEqual(list_ref(lst, 98).char, 'b')
 
+    def test_tree_list_insert(self):
+        self.assertEqual(tree_list_insert(self.list_1, self.tree_1), self.list_2)
+        self.assertEqual(tree_list_insert(self.list_2, self.tree_2), self.list_3)
 
 if (__name__ == '__main__'):
     unittest.main()
