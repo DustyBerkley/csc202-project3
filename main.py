@@ -11,14 +11,14 @@ class HLeaf:
     count: int
     char: str
 
-HTree = Union['HLeaf', 'HNode']
+HTree: TypeAlias = Union[HLeaf, 'HNode']
 
 @dataclass(frozen=True)
 class HNode:
     count: int
     char: str
-    left: 'HTree'
-    right: 'HTree'
+    left: HTree
+    right: HTree
 
 HTList: TypeAlias = Union['HTLNode', None]
 
